@@ -1,0 +1,2 @@
+# Enumerate all Group Policy template directories in sysvol, check if appropriate Group Policy Containers exist in the directory, if not, report it as orphaned (you could change the last part to remove them altogether)
+gci "\\$(($d=$env:USERDNSDOMAIN))\sysvol\$d\Policies"|?{$_.Name-imatch"^(?<g>\{[A-F\d]{8}(-[A-F\d]{4}){3}-[A-F\d]{12}\})$"}|?{-not [ADSI]::Exists("LDAP://CN=$($Matched["g"]),CN=Policies,CN=System,DC=$($d-split"\."-join",DC=")")}|%{"{0} is an orphan, remove it"-f$_.FullName}
